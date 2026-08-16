@@ -10,11 +10,12 @@ Prijavi Problem BiH is a mobile and backend application designed for citizens of
 - **Photo Evidence:** Allows users to attach photos of the issue either by taking a new picture or uploading from the gallery.
 - **Real-Time Status Tracking:** Users can track the status of their reports (New → In Progress → Resolved).
 - **Categorization:** Issues are sorted into clear categories (Potholes, Floods, Fires, Vandalism, etc.) with priority levels.
+- **Dynamic Dark/Light Mode:** Fully integrated and automated Dark/Light theme toggle that remembers user preferences.
 
 ## 🛠️ Technology Stack
 
-- **Mobile App:** React Native, Expo, Expo Router
-- **Mapping:** OpenStreetMap (via `react-native-maps` and `UrlTile`)
+- **Mobile App:** React Native, Expo (SDK 54), Expo Router
+- **Mapping:** CartoDB Voyager Map Tiles (via `react-native-maps` and `UrlTile`)
 - **Backend / Database:** Supabase (PostgreSQL, Authentication, Storage)
 - **State Management:** React Hooks & Context
 - **Language:** TypeScript & JavaScript
@@ -63,7 +64,7 @@ The mobile application is built using **Expo Router** for file-based routing.
 5. Scan the generated QR code using the Expo Go app on your phone.
 
 ## 🇧🇦 Map Configuration
-The application is specifically configured for Bosnia and Herzegovina. The interactive map uses OpenStreetMap tiles and restricts the initial view and marker clustering to the geographic bounds of BiH.
+The application is specifically configured for Bosnia and Herzegovina. The interactive map uses CartoDB Voyager tiles for clear, high-contrast visibility and restricts the initial view and marker clustering to the geographic bounds of BiH. The map auto-refreshes using `useFocusEffect` to ensure all new reports immediately appear on screen.
 
 ## 📝 License
 This project is open-source and available under the MIT License.
