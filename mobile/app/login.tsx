@@ -18,10 +18,21 @@ export default function LoginScreen() {
     }
 
     setLoading(true);
+    
+    // Capture the anonymous user ID before logging in
+    const { data: { user: oldUser } } = await supabase.auth.getUser();
+    const oldAnonId = oldUser?.is_anonymous ? oldUser.id : null;
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    
+    // If login was successful and we had an anonymous ID, link the old reports to the new account
+    if (!error && oldAnonId) {
+      await supabase.rpc('link_anonymous_reports', { old_anon_id: oldAnonId });
+    }
+    
     setLoading(false);
 
     if (error) {

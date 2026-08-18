@@ -18,10 +18,19 @@ export default function RegisterScreen() {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    // If the user is currently anonymous, updateUser converts them to a permanent account 
+    // while keeping their existing UUID (and their existing reports).
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let error;
+    if (user && user.is_anonymous) {
+      const { error: updateError } = await supabase.auth.updateUser({ email, password });
+      error = updateError;
+    } else {
+      const { error: signUpError } = await supabase.auth.signUp({ email, password });
+      error = signUpError;
+    }
+    
     setLoading(false);
 
     if (error) {
