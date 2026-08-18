@@ -27,7 +27,9 @@ export default function ProfileScreen() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser(null);
+    // Instantly assign a new anonymous account so reports are never NULL
+    const { data } = await supabase.auth.signInAnonymously();
+    setUser(data?.user || null);
   };
 
   if (loading) {
@@ -38,7 +40,7 @@ export default function ProfileScreen() {
     );
   }
 
-  if (!user) {
+  if (!user || user.is_anonymous) {
     return (
       <View style={styles.container}>
         <View style={styles.authContainer}>
