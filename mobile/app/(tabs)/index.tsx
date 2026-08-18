@@ -42,7 +42,26 @@ export default function HomeScreen() {
 
     setIsSubmitting(true);
     try {
-      // 1. Upload photos to Supabase Storage if any
+      // 1. Get user ID and check for spam (Cooldown limit: 5 minutes)
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { data: recentReports, error: checkError } = await supabase
+          .from('reports')
+          .select('created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1);
+          
+        if (!checkError && recentReports && recentReports.length > 0) {
+          const diffMinutes = (new Date().getTime() - new Date(recentReports[0].created_at).getTime()) / 60000;
+          if (diffMinutes < 5) {
+            throw new Error(`Zaštita od spama. Molimo sačekajte ${Math.ceil(5 - diffMinutes)} min. prije nove prijave.`);
+          }
+        }
+      }
+
+      // 2. Upload photos to Supabase Storage if any
       const photoPaths: string[] = [];
       
       for (const uri of photos) {
@@ -65,9 +84,6 @@ export default function HomeScreen() {
         
         photoPaths.push(filePath);
       }
-
-      // 2. Get user ID if logged in
-      const { data: { user } } = await supabase.auth.getUser();
 
       // 3. Insert report into database
       const { error: insertError } = await supabase

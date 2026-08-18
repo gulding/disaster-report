@@ -4,6 +4,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider as NavThemeProvider } from '@rea
 import { CustomThemeProvider, useTheme } from '../context/ThemeContext';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 import { useColorScheme } from '@/components/useColorScheme';
 
@@ -33,6 +34,16 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+      
+      // Auto sign-in anonymously if no session exists
+      const initAnonAuth = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          const { error } = await supabase.auth.signInAnonymously();
+          if (error) console.log("Anon auth error:", error);
+        }
+      };
+      initAnonAuth();
     }
   }, [loaded]);
 
